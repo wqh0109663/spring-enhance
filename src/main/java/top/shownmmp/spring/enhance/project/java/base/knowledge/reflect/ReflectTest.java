@@ -45,6 +45,7 @@ public class ReflectTest {
 
     /**
      * 直接用ClassForName获得
+     *
      * @return User
      * @throws Exception 异常
      */
@@ -58,11 +59,27 @@ public class ReflectTest {
 
     /**
      * 直接用类名点class获得
+     *
      * @return User
      * @throws Exception 异常
      */
     private static User initByUserClass() throws Exception {
         Class clazz = User.class;
+        /*
+         * 后面是跟上一个差不多的
+         */
+        return null;
+    }
+
+    /**
+     * 直接obj类getclass方法获得
+     *
+     * @return User
+     * @throws Exception 异常
+     */
+    private static User initByObjectGetClass() throws Exception {
+        User user = new User();
+        Class<? extends User> aClass = user.getClass();
         /*
          * 后面是跟上一个差不多的
          */
