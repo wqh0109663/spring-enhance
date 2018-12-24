@@ -47,6 +47,12 @@
             <artifactId>sqljdbc4</artifactId>
             <version>4.0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/dom4j/dom4j -->
+        <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>1.5</version>
+        </dependency>
 
 
     </dependencies>
