@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans>
+    <bean id="demo" class="">
+        <!--属性注入方法一   name标签实际上就是set方法的名字-->
+        <property name="HelloTest" value="你好"/>
+    </bean>
+    <bean id="demo3" class="it.huanzi.HelloTest" >
+        <!--这个bean还可以使用p命名空间-->
+    </bean>
+    <!--如果想把一个经常要被使用的bean 给抽取出来可以使用util来完成  如下实例  和p命名空间一样都要先引入约束-->
+    <!--<util:list></util:list>-->
+    <bean id="demo1" class="it.huanzi.HelloTest">
+        <property name="name" value="嘿嘿"/>
+        <property name="addr" value="湖北"/>
+        <!--引用可以是标签里面声明 也可以在属性值里面声明 也可以使用内部bean-->
+        <!-- <property name="p"  ref="person"/>-->
+        <!--<property name="p"  >
+            <ref bean="person"/>
+        </property>-->
+        <!-- 内部bean来引用 ，内部bean不能被外部引用-->
+        <property name="p">
+            <bean class="it.huanzi.Person">
+                <property name="age" value="22"/>
+                <property name="userName" value="laowu"/>
+            </bean>
+        </property>
+
+    </bean>
+    <bean id="person" class="it.huanzi.Person">
+        <!--属性注入方法二 使用有参构造器注入 index是参数的位置从0开始 ，type 是 参数的类型-->
+        <constructor-arg value="老王" index="0" type="java.lang.String"/>
+        <constructor-arg value="20" index="1" type="int"/>
+        <!--如果要让某一个属性值为null 的话可以使用下面的方法来完成-->
+        <!-- <constructor-arg><null/></constructor-arg>-->
+    </bean>
+</beans>
