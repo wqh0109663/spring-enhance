@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script type="text/javascript">
+
+
+    function search(currentPage, size) {
+        var loading = $('#col-sm-12');
+        var form = new FormData(document.getElementById("form1"));
+        console.log("form:%o,%o", form, $('#form1').serialize());
+        $.ajax({
+//几个参数需要注意一下
+            type: "POST",//方法类型
+            dataType: "json",//预期服务器返回的数据类型
+            url: "${pageContext.request.contextPath}/km/myarchiveServlet?currentPage="
+                + currentPage + "&size=" + size,
+            data: $('#form1').serialize(),
+            beforeSend: function () {
+                /* 显示加载 */
+//$("#contentTableId tbody").empty();
+                $("#contentTbodyId tr").remove();
+//$("#contentTableId tbody").html("");
+                loading.show();
+            },
+            success: function (data) {
+                console.log("result:异步:%o", data);//打印服务端返回的数据(调试用)
+                parserList(data.datas);
+                /* 分页 */
+                var page = data.page
+                getPage(page);
+            },
+            error: function () {
+                alert("不支持的搜索内容");
+            },
+            complete: function (XMLHttpRequest) {
+                /* 隐藏加载 */
+                loading.hide();
+            }
+        });
+    };
+
+    /* 默认加载第一页中的数据 */
+    $(document).ready(getContent(1, 15));
+
+    /**
+     * 分页，条目多的时候根据指定显示多少个，才进行显示点点点，默认永远有最后一个被显示
+     * @param page json数据
+     */
+    function getPage(page) {
+        var totalSize = page.totalSize
+        var pageSize = page.pageSize
+        var currentPage = page.currentPage
+        currentPage = parseInt(currentPage);
+        var totlePage = Math.ceil(totalSize / pageSize)
+        console
+            .log("currentPage:%o,type:%o", currentPage,
+                typeof (currentPage))
+        console.log("totlePage:%o,type:%o", totlePage, typeof (totlePage))
+        var pageId = document.getElementById("pageId")
+        $("#pageId li").remove();
+        /* 添加上一页 */
+        if (currentPage !== 1) {
+            var previous = document.createElement("li");
+            previous.setAttribute("class", "page-item");
+            var previous_a = document.createElement("a");
+            previous_a.setAttribute("href", "javascript:;")
+            previous_a.setAttribute("onclick", 'getContent('
+                + (currentPage - 1) + ',15)')
+            previous_a.text = "上一页"
+            previous.appendChild(previous_a)
+            pageId.appendChild(previous)
+        }
+//如果页码数大于6页，默认展示前五页，和最后一页
+        if (totlePage > 6) {
+            if (currentPage > 5) {
+//第一页
+                var li = document.createElement("li");
+                li.setAttribute("class", "page-item");
+                var a = document.createElement("a");
+                page.setAttribute("href", "javascript:;")
+                page.setAttribute("onclick", 'getContent(' + 1 + ',15)')
+                page.text = 1
+                li.appendChild(page)
+                pageId.appendChild(li)
+//显示...
+                var li1 = document.createElement("li");
+                li1.setAttribute("class", "page-item disabled");
+                var a = document.createElement("a");
+                page.setAttribute("href", "javascript:;");
+                page.text = '...';
+                li1.appendChild(page);
+                pageId.appendChild(li1);
+//如果是最后一页
+                if (currentPage == totlePage) {
+//显示当前页的左边两个的页数
+                    for (var m = currentPage - 2; m < currentPage + 1; m++) {
+                        if (!(currentPage + 1 >= totlePage)) {
+                            continue;
+                        }
+                        var li = document.createElement("li");
+                        if (currentPage == m) {
+                            li.setAttribute("class", "page-item active");
+                        } else {
+                            li.setAttribute("class", "page-item");
+                        }
+                        var a = document.createElement("a");
+                        page.setAttribute("href", "javascript:;")
+                        page.setAttribute("onclick", 'getContent(' + m + ',15)')
+                        page.text = m
+                        li.appendChild(page)
+                        pageId.appendChild(li)
+                    }
+                } else {
+//显示当前页的左右两边的页数
+                    for (var m = currentPage - 1; m < currentPage + 2; m++) {
+                        /* if (!(currentPage + 1 >= totlePage)) {
+                        continue;
+                        } */
+                        var li = document.createElement("li");
+                        if (currentPage == m) {
+                            li.setAttribute("class", "page-item active");
+                        } else {
+                            li.setAttribute("class", "page-item");
+                        }
+                        var a = document.createElement("a");
+                        page.setAttribute("href", "javascript:;")
+                        page.setAttribute("onclick", 'getContent(' + m + ',15)')
+                        page.text = m
+                        li.appendChild(page)
+                        pageId.appendChild(li)
+
+                    }
+                }
+            } else {
+                for (var m = 0; m < 5; m++) {
+                    var li = document.createElement("li");
+                    if (currentPage == m + 1) {
+                        li.setAttribute("class", "page-item active");
+                    } else {
+                        li.setAttribute("class", "page-item");
+                    }
+                    var a = document.createElement("a");
+                    page.setAttribute("href", "javascript:;")
+                    page.setAttribute("onclick", 'getContent(' + (m + 1) + ',15)')
+                    page.text = m + 1
+                    li.appendChild(page)
+                    pageId.appendChild(li)
+                }
+
+            }
+            if (!(currentPage + 1 >= totlePage)) {
+//显示...
+                var li1 = document.createElement("li");
+                li1.setAttribute("class", "page-item disabled");
+                var a = document.createElement("a");
+                page.setAttribute("href", "javascript:;");
+                page.text = '...';
+                li1.appendChild(page);
+                pageId.appendChild(li1);
+//最后一页
+                var li = document.createElement("li");
+                if (currentPage == totlePage) {
+                    li.setAttribute("class", "page-item active");
+                } else {
+                    li.setAttribute("class", "page-item");
+                }
+                var a = document.createElement("a");
+                page.setAttribute("href", "javascript:;")
+                page.setAttribute("onclick", 'getContent(' + totlePage + ',15)')
+                page.text = totlePage
+                li.appendChild(page)
+                pageId.appendChild(li)
+            }
+
+        } else {
+            for (var m = 0; m < totlePage; m++) {
+                var li = document.createElement("li");
+                if (currentPage == m + 1) {
+                    li.setAttribute("class", "page-item active");
+                } else {
+                    li.setAttribute("class", "page-item");
+                }
+                var a = document.createElement("a");
+                page.setAttribute("href", "javascript:;")
+                page.setAttribute("onclick", 'getContent(' + (m + 1) + ',15)')
+                page.text = m + 1
+                li.appendChild(page)
+                pageId.appendChild(li)
+            }
+        }
+        /* 添加下一页 */
+        if (currentPage !== totlePage) {
+            var next = document.createElement("li");
+            next.setAttribute("class", "page-item");
+            var next_a = document.createElement("a");
+            next_a.setAttribute("href", "javascript:;");
+            next_a.setAttribute("onclick", 'getContent(' + (currentPage + 1)
+                + ',15)');
+            next_a.text = "下一页";
+            next.appendChild(next_a);
+            pageId.appendChild(next);
+        }
+        var totalSizeId = document.getElementById("totalSizeId")
+        $("#totalSizeId p").remove();
+        var span_total = document.createElement("p");
+        span_total.innerText = "共" + totalSize + "条记录"
+        totalSizeId.appendChild(span_total);
+    }
+</script>
+</body>
+</html>
